@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>憲政院</title>
+<meta name="theme-color" content="#2A2118">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="憲政院">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+:root{--paper:#F4EFE4;--sheet:#FBF8F1;--ink:#2A2118;--sub:#6E6252;--rule:#D8CDB8;--gold:#A8842C;--red:#9E2A22;
+  --rinen:#7A3B8F;--seido:#2F5D7A;--ok:#3D7A4A}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP",serif;font-size:15.5px;line-height:1.75;
+  padding-bottom:calc(64px + env(safe-area-inset-bottom));-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button,input,select,textarea,.ui{font-family:"BIZ UDPGothic","Hiragino Sans","Noto Sans JP",sans-serif}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wrap{max-width:660px;margin:0 auto;padding:calc(.9rem + env(safe-area-inset-top)) 1rem 2rem}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding-bottom:.55rem;border-bottom:3px double var(--ink);margin-bottom:1rem}
+.head h1{margin:0;font-size:1.35rem;letter-spacing:.25em}
+.head .sub{color:var(--sub);font-size:.8rem;text-align:right;font-family:"BIZ UDPGothic",sans-serif}
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:.85rem 1rem;margin:0 0 1rem}
+.card h2{margin:0 0 .55rem;font-size:1.02rem;letter-spacing:.12em;display:flex;justify-content:space-between;align-items:baseline;gap:.5rem}
+.card h2 small{font-weight:400;color:var(--sub);font-size:.76rem;letter-spacing:0;font-family:"BIZ UDPGothic",sans-serif}
+.view[hidden]{display:none}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:4px;padding:.45rem 1.1rem;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#fff}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff}
+.btn.sm{padding:.2rem .7rem;font-size:.84rem}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.note{font-size:.8rem;color:var(--sub);margin:.25rem 0;font-family:"BIZ UDPGothic",sans-serif;line-height:1.6}
+.f{margin:.4rem 0}.f label{display:block;font-size:.76rem;color:var(--sub);margin-bottom:.15rem;font-family:"BIZ UDPGothic",sans-serif}
+.f input,.f select,.f textarea{width:100%;padding:.45rem .55rem;border:1px solid var(--rule);border-radius:4px;background:#fff}
+.f textarea{line-height:1.6}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(9rem,1fr));gap:.4rem .7rem}
+.status{font-size:.84rem;color:var(--sub)}.status.err{color:var(--red)}
+.linkbtn{border:none;background:none;color:var(--seido);cursor:pointer;padding:0;font-size:.84rem;text-decoration:underline}
+.linkbtn.del{color:var(--red)}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden;margin:0 0 .7rem;flex-wrap:wrap}
+.seg button{border:none;background:#fff;padding:.25rem .85rem;cursor:pointer;color:var(--sub);font-size:.86rem}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+
+/* 条文 */
+.kind{display:inline-block;font-size:.7rem;font-weight:700;border-radius:3px;padding:0 .4rem;color:#fff;font-family:"BIZ UDPGothic",sans-serif;vertical-align:.12em}
+.kind.rinen{background:var(--rinen)}.kind.seido{background:var(--seido)}.kind.none{background:#999}
+.root{display:inline-block;font-size:.7rem;border:1px solid var(--gold);color:var(--gold);border-radius:3px;padding:0 .35rem;font-family:"BIZ UDPGothic",sans-serif;vertical-align:.12em}
+.tag{display:inline-block;font-size:.7rem;border:1px solid var(--rule);color:var(--sub);border-radius:3px;padding:0 .35rem;font-family:"BIZ UDPGothic",sans-serif;vertical-align:.12em}
+.tag.warn{border-color:var(--red);color:var(--red)}
+.chap{font-size:.95rem;font-weight:700;letter-spacing:.15em;margin:1.2rem 0 .3rem;padding-bottom:.2rem;border-bottom:1px solid var(--rule)}
+.art{padding:.55rem 0 .6rem;border-bottom:1px dashed var(--rule);cursor:pointer}
+.art:last-child{border-bottom:none}
+.art-h{display:flex;gap:.4rem;align-items:baseline;flex-wrap:wrap}
+.art-no{font-weight:700;letter-spacing:.05em}
+.art-t{white-space:pre-wrap;word-break:break-word;margin:.15rem 0 0}
+.art-basis{font-size:.78rem;color:var(--sub);font-family:"BIZ UDPGothic",sans-serif;margin-top:.15rem}
+.art.susp .art-t{opacity:.5;text-decoration:line-through}
+.detail{border:2px solid var(--ink);border-radius:6px;background:#fff;padding:.9rem 1rem;margin:0 0 1rem}
+.detail h3{margin:0 0 .4rem;font-size:1.1rem;letter-spacing:.08em}
+.detail .art-t{font-size:1.08rem}
+.ladder{display:flex;gap:2px;margin:.4rem 0}
+.ladder span{flex:1;text-align:center;font-size:.66rem;padding:.2rem 0;border-radius:2px;background:#EEE6D6;color:var(--sub);font-family:"BIZ UDPGothic",sans-serif;line-height:1.3}
+.ladder span.on{background:var(--rinen);color:#fff}
+.deep h4{margin:.8rem 0 .2rem;font-size:.86rem;letter-spacing:.08em}
+.ev{font-size:.88rem;padding:.25rem 0;border-bottom:1px dotted var(--rule)}
+.ev small{color:var(--sub);font-family:"BIZ UDPGothic",sans-serif;margin-right:.4rem}
+
+/* 改正 */
+.prop{border:1px solid var(--rule);border-left:5px solid var(--seido);border-radius:6px;background:#fff;padding:.65rem .8rem;margin:.5rem 0}
+.prop.heavy{border-left-color:var(--rinen)}
+.prop-h{display:flex;gap:.4rem;align-items:baseline;flex-wrap:wrap}
+.prop-h b{flex:1;min-width:0}
+.stage{display:flex;gap:2px;margin:.4rem 0}
+.stage span{flex:1;text-align:center;font-size:.7rem;padding:.15rem 0;background:#EEE6D6;color:var(--sub);border-radius:2px;font-family:"BIZ UDPGothic",sans-serif}
+.stage span.on{background:var(--ink);color:var(--paper)}.stage span.done{background:#C9BBA0;color:var(--ink)}
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:.4rem 0}
+.diff div{background:#F7F2E7;border-radius:4px;padding:.4rem .5rem;white-space:pre-wrap;word-break:break-word;font-size:.9rem}
+.diff .old{border-left:3px solid #BBB}.diff .new{border-left:3px solid var(--gold)}
+.diff small{display:block;font-size:.7rem;color:var(--sub);font-family:"BIZ UDPGothic",sans-serif}
+.q{margin:.5rem 0}.q label{display:block;font-size:.84rem;margin-bottom:.15rem}
+.lock{font-size:.82rem;color:var(--red);font-family:"BIZ UDPGothic",sans-serif;margin:.3rem 0}
+
+/* 今日・審査 */
+.today-art{font-size:1.12rem;white-space:pre-wrap;word-break:break-word;margin:.3rem 0 .5rem}
+.ans{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.4rem}
+.alert{border:1px solid var(--gold);background:#FBF3DE;border-radius:6px;padding:.5rem .75rem;margin:0 0 .8rem;font-size:.9rem}
+.alert.red{border-color:var(--red);background:#F8E6E1}
+.alert b{letter-spacing:.05em}
+.item{padding:.45rem 0;border-bottom:1px dashed var(--rule);font-size:.92rem}
+.item small{color:var(--sub);font-family:"BIZ UDPGothic",sans-serif}
+.hist{font-size:.86rem;padding:.35rem 0;border-bottom:1px dotted var(--rule)}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--sheet);border-top:1px solid var(--rule);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav.tabs button{flex:1;border:none;background:none;padding:.8rem 0;cursor:pointer;color:var(--sub);font-weight:700;font-size:.86rem;white-space:nowrap;min-width:0}
+nav.tabs button[aria-selected="true"]{color:var(--ink);box-shadow:inset 0 3px 0 var(--gold)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));background:var(--ink);color:var(--paper);border-radius:6px;padding:.6rem .9rem;font-size:.9rem;z-index:40;max-width:calc(100% - 2rem);font-family:"BIZ UDPGothic",sans-serif}
+.toast[hidden]{display:none}
+.se-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.5rem 0;font-size:.86rem}.se-btn{min-width:2.6rem;border:1px solid var(--rule);border-radius:999px;background:#fff;padding:.1rem .7rem;cursor:pointer}.se-btn[aria-pressed="true"]{background:var(--ink);color:var(--paper)}.se-vol{display:flex;align-items:center;gap:.3rem}.se-vol input{width:8rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="view" id="view-today">
+    <header class="head"><h1>憲政院</h1><div class="sub" id="today-sub">—</div></header>
+    <div id="today-alerts"></div>
+    <div class="card" id="today-card"></div>
+    <div class="card" id="breach-card"></div>
+  </section>
+  <section class="view" id="view-code" hidden>
+    <header class="head"><h1>法典</h1><div class="sub" id="code-sub">—</div></header>
+    <div id="code-top"></div>
+    <div id="code-detail"></div>
+    <div class="seg" id="code-seg"><button type="button" data-cview="all" aria-pressed="true">全文</button><button type="button" data-cview="rinen" aria-pressed="false">理念</button><button type="button" data-cview="seido" aria-pressed="false">制度と根拠</button><button type="button" data-cview="hist" aria-pressed="false">改正の歴史</button></div>
+    <div class="card" id="code-list"></div>
+  </section>
+  <section class="view" id="view-amend" hidden>
+    <header class="head"><h1>改正</h1><div class="sub">発議・冷却・審議・議決・公布</div></header>
+    <div id="amend-form"></div>
+    <div id="amend-list"></div>
+  </section>
+  <section class="view" id="view-case" hidden>
+    <header class="head"><h1>判例</h1><div class="sub">迷ったら、憲法に聞く</div></header>
+    <div class="card" id="case-form"></div>
+    <div id="case-list"></div>
+  </section>
+  <section class="view" id="view-review" hidden>
+    <header class="head"><h1>審査</h1><div class="sub" id="review-sub">—</div></header>
+    <div id="review-body"></div>
+  </section>
+  <section class="view" id="view-set" hidden>
+    <header class="head"><h1>設定</h1><div class="sub" id="ver"></div></header>
+    <div class="card"><h2>改正の手続き<small>数字は憲法の改正条項に合わせる</small></h2><div class="grid2">
+      <div class="f"><label for="s-cs">制度の冷却期間(日)</label><input id="s-cs" type="number" min="0" max="90"></div>
+      <div class="f"><label for="s-cr">理念の冷却期間(日)</label><input id="s-cr" type="number" min="0" max="180"></div>
+      <div class="f"><label for="s-trial">試行の日数(はじめの値)</label><input id="s-trial" type="number" min="1" max="180"></div>
+      <div class="f"><label for="s-susp">一時停止の上限(日)</label><input id="s-susp" type="number" min="1" max="60"></div>
+      <div class="f"><label for="s-lock">否決のあと出し直せない日数</label><input id="s-lock" type="number" min="0" max="365"></div>
+      <div class="f"><label for="s-rev">審査の間隔(日)</label><input id="s-rev" type="number" min="1" max="60"></div>
+    </div><div class="row"><button type="button" class="btn sm" id="save-set">保存する</button><span class="status" id="set-status"></span></div></div>
+    <div class="card"><h2>接続<small>GitHub</small></h2>
+      <p class="note">憲法と記録は notion-daily の roadmap/apps/kenseiin に置きます。</p>
+      <div class="grid2">
+        <div class="f"><label for="c-owner">ユーザー名</label><input id="c-owner" autocomplete="off"></div>
+        <div class="f"><label for="c-repo">リポジトリ</label><input id="c-repo" autocomplete="off"></div>
+        <div class="f"><label for="c-branch">ブランチ</label><input id="c-branch" autocomplete="off"></div>
+      </div>
+      <div class="f"><label for="c-token">トークン</label><input id="c-token" type="password" autocomplete="off"></div>
+      <div class="row"><button type="button" class="btn sm" id="connect">接続して読み込む</button><span class="status" id="conn-status"></span></div>
+      <p class="note">今開いている版:<b id="app-version"></b></p></div>
+    <div class="card"><h2>効果音<small>ほかのアプリと共通</small></h2><p class="note" id="se-anchor">公布や議決のときの音を鳴らします。</p></div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+<nav class="tabs" role="tablist">
+  <button role="tab" aria-selected="true" data-view="today">今日</button>
+  <button role="tab" aria-selected="false" data-view="code">法典</button>
+  <button role="tab" aria-selected="false" data-view="amend">改正</button>
+  <button role="tab" aria-selected="false" data-view="case">判例</button>
+  <button role="tab" aria-selected="false" data-view="review">審査</button>
+  <button role="tab" aria-selected="false" data-view="set">設定</button>
+</nav>
+<script id="se-core">
+
+// ───────── 効果音(ブラウザの中で音を合成。音のファイルは使わない)─────────
+// 設定(入/切・音量)は 3つのアプリで共通(localStorage の se-on / se-vol)
+const SE = (() => {
+  let ctx = null, master = null, lastTap = 0, lastErr = 0;
+  const ls = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } };
+  let on = ls("se-on", "1") !== "0", vol = Math.max(0, Math.min(1, +ls("se-vol", "0.5")));
+  function ac(){
+    if (!on) return null;
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+    if (!ctx) { ctx = new AC(); master = ctx.createGain(); master.connect(ctx.destination); }
+    if (ctx.state === "suspended") ctx.resume();
+    master.gain.value = vol * 0.9;
+    return ctx;
+  }
+  // 1つの音:周波数 f(滑らせるなら f2)、始まり t、長さ d、波の形、大きさ g
+  function note(c, f, t, d, o){
+    o = o || {};
+    const osc = c.createOscillator(), gn = c.createGain(), t0 = c.currentTime + (t || 0);
+    osc.type = o.type || "sine"; osc.frequency.setValueAtTime(f, t0);
+    if (o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2, t0 + d);
+    const g = o.g == null ? 0.2 : o.g, a = o.a == null ? 0.005 : o.a;
+    gn.gain.setValueAtTime(0.0001, t0); gn.gain.exponentialRampToValueAtTime(g, t0 + a);
+    gn.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+    let last = gn;
+    if (o.lp) { const fl = c.createBiquadFilter(); fl.type = "lowpass"; fl.frequency.value = o.lp; gn.connect(fl); last = fl; }
+    osc.connect(gn); last.connect(master); osc.start(t0); osc.stop(t0 + d + 0.05);
+  }
+  // 鐘のような音(基音 + 倍音)
+  const bell = (c, f, t, d, g) => { note(c, f, t, d, { g: g }); note(c, f * 2, t, d * 0.6, { g: g * 0.35 }); note(c, f * 3.01, t, d * 0.3, { g: g * 0.12 }); };
+  // ざわめき(風・波)
+  function noise(c, t, d, o){
+    o = o || {};
+    const n = Math.floor(c.sampleRate * d), buf = c.createBuffer(1, n, c.sampleRate), ch = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) ch[i] = Math.random() * 2 - 1;
+    const src = c.createBufferSource(), fl = c.createBiquadFilter(), gn = c.createGain(), t0 = c.currentTime + (t || 0);
+    src.buffer = buf; fl.type = o.type || "lowpass"; fl.Q.value = o.q || 0.7;
+    fl.frequency.setValueAtTime(o.f || 400, t0); if (o.f2) fl.frequency.exponentialRampToValueAtTime(o.f2, t0 + d * 0.8);
+    const g = o.g || 0.08;
+    gn.gain.setValueAtTime(0.0001, t0); gn.gain.exponentialRampToValueAtTime(g, t0 + d * 0.35); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+    src.connect(fl); fl.connect(gn); gn.connect(master); src.start(t0); src.stop(t0 + d + 0.05);
+  }
+  const lib = {
+    tap: c => note(c, 880, 0, 0.05, { f2: 660, g: 0.05 }),
+    tab: c => { note(c, 520, 0, 0.07, { type: "triangle", g: 0.07 }); note(c, 780, 0.03, 0.06, { type: "triangle", g: 0.04 }); },
+    toggleOn: c => note(c, 600, 0, 0.08, { f2: 1150, g: 0.08 }),
+    toggleOff: c => note(c, 900, 0, 0.08, { f2: 480, g: 0.06 }),
+    done: c => { bell(c, 1046.5, 0, 0.45, 0.11); bell(c, 1318.5, 0.08, 0.6, 0.11); },
+    save: c => { bell(c, 784, 0, 0.35, 0.08); bell(c, 1174.7, 0.01, 0.4, 0.06); },
+    remove: c => note(c, 520, 0, 0.14, { f2: 240, type: "triangle", g: 0.08 }),
+    error: c => { note(c, 220, 0, 0.09, { type: "square", g: 0.05, lp: 900 }); note(c, 196, 0.12, 0.12, { type: "square", g: 0.05, lp: 900 }); },
+    open: c => noise(c, 0, 0.18, { f: 300, f2: 2400, type: "bandpass", q: 1.2, g: 0.05 }),
+    fanfare: c => { [523.25, 659.25, 783.99].forEach((f, i) => { note(c, f, i * 0.09, 0.3, { type: "triangle", g: 0.12 }); note(c, f * 2, i * 0.09, 0.2, { g: 0.03 }); });
+      bell(c, 1046.5, 0.27, 1.1, 0.13); note(c, 523.25, 0.27, 1.0, { type: "triangle", g: 0.06 });
+      [2093, 2637, 3136, 2637].forEach((f, i) => note(c, f, 0.45 + i * 0.07, 0.25, { g: 0.025 })); },
+    levelup: c => { note(c, 600, 0, 0.5, { f2: 1600, type: "triangle", g: 0.08 }); [1568, 1975.5, 2349.3, 3136].forEach((f, i) => bell(c, f, 0.35 + i * 0.06, 0.4, 0.04)); },
+    issue: c => { [392, 523.25, 659.25, 783.99].forEach((f, i) => note(c, f, i * 0.12, i === 3 ? 0.9 : 0.22, { type: "sawtooth", g: 0.07, lp: 1800, a: 0.02 }));
+      note(c, 196, 0.36, 0.9, { type: "sawtooth", g: 0.04, lp: 700, a: 0.03 }); },
+    swell: c => { noise(c, 0, 0.9, { f: 200, f2: 1400, g: 0.05 }); [440, 554.4, 659.3].forEach(f => note(c, f, 0.05, 0.9, { g: 0.035, a: 0.35 })); },
+    unswell: c => { noise(c, 0, 0.6, { f: 1200, f2: 250, g: 0.04 }); note(c, 554.4, 0, 0.5, { f2: 440, g: 0.04, a: 0.1 }); },
+    pluck: c => { note(c, 880, 0, 0.35, { type: "triangle", g: 0.09, a: 0.002 }); note(c, 1318.5, 0.05, 0.4, { type: "triangle", g: 0.06, a: 0.002 }); },
+    link: c => { note(c, 659.3, 0, 0.25, { type: "triangle", g: 0.08, a: 0.002 }); note(c, 987.8, 0.09, 0.35, { type: "triangle", g: 0.08, a: 0.002 }); },
+    lock: c => { note(c, 180, 0, 0.06, { type: "square", g: 0.05, lp: 1200 }); note(c, 120, 0.05, 0.08, { type: "square", g: 0.05, lp: 900 }); },
+    unlock: c => { note(c, 160, 0, 0.05, { type: "square", g: 0.05, lp: 1200 }); bell(c, 1318.5, 0.08, 0.45, 0.07); },
+    send: c => noise(c, 0, 0.25, { f: 2400, f2: 400, type: "bandpass", q: 1.5, g: 0.06 }),
+    down: c => { note(c, 660, 0, 0.25, { f2: 440, type: "triangle", g: 0.07 }); },
+  };
+  function play(name, opt){
+    try {
+      const c = ac(); if (!c || !lib[name]) return;
+      if (name === "tap" || name === "tab") { const now = Date.now(); if (now - lastTap < 45) return; lastTap = now; }
+      if (name === "error") { const now = Date.now(); if (now - lastErr < 500) return; lastErr = now; }
+      lib[name](c, opt);
+    } catch (e) {}
+  }
+  // 場面の見分け:アプリごとの [選び方, 音] の並び(上から順に見る)
+  let rules = [];
+  function soundFor(el){
+    for (const [sel, snd] of rules) { const hit = el.closest(sel); if (hit) return typeof snd === "function" ? snd(hit) : snd; }
+    const inp = el.closest("input");
+    if (inp && (inp.type === "checkbox" || inp.type === "radio")) return inp.checked ? "toggleOn" : "toggleOff";
+    if (el.closest("nav button, [role=tab], .tabs button")) return "tab";
+    if (el.closest("button, a[href], summary, .chip-b, [data-v]")) return "tap";
+    return null;
+  }
+  function init(appRules){
+    rules = appRules || [];
+    document.addEventListener("click", e => { const s = e.target && e.target.closest ? soundFor(e.target) : null; if (s) play(s); }, true);
+    // エラーの表示(class="err")が出たら、低い音
+    try {
+      new MutationObserver(ms => { for (const m of ms) { const el = m.target.nodeType === 1 ? m.target : m.target.parentElement; if (!el || !el.closest) continue;
+        const er = el.closest(".err"); if (er && (er.textContent || "").trim()) { play("error"); break; } } })
+        .observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ["class"] });
+    } catch (e) {}
+  }
+  // 設定の欄(入/切・音量)。アプリの版の表示のそばに置く
+  function mount(anchor){
+    if (!anchor || document.getElementById("se-row")) return;
+    const row = document.createElement("div"); row.id = "se-row"; row.className = "se-row";
+    row.innerHTML = '<span>効果音</span><button type="button" id="se-on" class="se-btn"></button><label class="se-vol">音量 <input id="se-vol" type="range" min="0" max="1" step="0.05"></label>';
+    anchor.parentNode.insertBefore(row, anchor.nextSibling);
+    const b = row.querySelector("#se-on"), r = row.querySelector("#se-vol");
+    const show = () => { b.textContent = on ? "入" : "切"; b.setAttribute("aria-pressed", String(on)); r.value = vol; r.disabled = !on; };
+    b.addEventListener("click", () => { on = !on; try { localStorage.setItem("se-on", on ? "1" : "0"); } catch (e) {} show(); if (on) play("toggleOn"); });
+    r.addEventListener("input", () => { vol = +r.value; try { localStorage.setItem("se-vol", String(vol)); } catch (e) {} });
+    r.addEventListener("change", () => play("done"));
+    show();
+  }
+  return { play, init, mount, soundFor, get on(){ return on; } };
+})();
+
+</script>
+<script>
+(function(){
+"use strict";
+const APP_VERSION = "2026-10-12 r1";
+const DATA = "roadmap/apps/kenseiin/data.json";
+const KEY_CONN = "kenseiin-conn", KEY_LOCAL = "kenseiin-local";
+const DEFAULTS = { version: 1, phase: "draft", enactedAt: null, ver: 0, articles: [], history: [], proposals: [], daily: [], breaches: [], cases: [], reviews: [],
+  settings: { coolSeido: 3, coolRinen: 14, trial: 30, susp: 14, lock: 30, review: 7 } };
+const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+// 1日は朝5時で区切る(ほかのアプリと同じ)
+const taskDay = t => new Date((t || Date.now()) + 4 * 3600e3).toISOString().slice(0, 10);
+const addDays = (d, n) => new Date(Date.parse(d + "T00:00:00Z") + n * 864e5).toISOString().slice(0, 10);
+const daysBetween = (a, b) => Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / 864e5);
+const md = d => d ? (+d.slice(5, 7)) + "/" + (+d.slice(8, 10)) : "";
+
+/* ───────── 取り込み:貼り付けた本文を条文に分ける ─────────
+   「第N章」は章、「第N条」(漢数字でもいい)で条を区切る。条が見つからなければ、空行で区切る */
+function kanjiNum(s){
+  s = String(s).trim(); if (/^\d+$/.test(s)) return +s;
+  const d = { 〇: 0, 一: 1, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 }, u = { 十: 10, 百: 100 };
+  let n = 0, cur = 0;
+  for (const c of s.replace(/[０-９]/g, x => String.fromCharCode(x.charCodeAt(0) - 0xFEE0))) {
+    if (/\d/.test(c)) { cur = cur * 10 + +c; continue; }
+    if (c in d) cur = d[c]; else if (c in u) { n += (cur || 1) * u[c]; cur = 0; }
+  }
+  return n + cur;
+}
+function parseConstitution(text){
+  const lines = String(text || "").replace(/\r/g, "").split("\n"), out = [];
+  let chapter = "", cur = null, pre = [];
+  const ART = /^\s*第\s*([0-9０-９〇一二三四五六七八九十百]+)\s*条\s*(?:[（(]([^）)]*)[）)])?\s*(.*)$/, CH = /^\s*(第\s*[0-9０-９〇一二三四五六七八九十百]+\s*章.*)$/;
+  for (const ln of lines) {
+    let m;
+    if ((m = CH.exec(ln))) { if (cur) { out.push(cur); cur = null; } chapter = m[1].trim(); continue; }
+    if ((m = ART.exec(ln))) { if (cur) out.push(cur); cur = { no: kanjiNum(m[1]), chapter, title: (m[2] || "").trim(), text: (m[3] || "").trim() }; continue; }
+    if (cur) cur.text += (cur.text ? "\n" : "") + ln.trim(); else if (ln.trim()) pre.push(ln.trim());
+  }
+  if (cur) out.push(cur);
+  out.forEach(a => a.text = a.text.replace(/\n{3,}/g, "\n\n").trim());
+  if (!out.length) return String(text || "").split(/\n\s*\n/).map(x => x.trim()).filter(Boolean).map((t, i) => ({ no: i + 1, chapter: "", title: "", text: t }));
+  if (pre.length) out.unshift({ no: 0, chapter: "", title: "前文", text: pre.join("\n") });
+  return out;
+}
+
+/* ───────── 条文 ───────── */
+const live = data => data.articles.filter(a => !a.deleted).sort((a, b) => a.no - b.no);
+const byId = (data, id) => data.articles.find(a => a.id === id) || null;
+const artLabel = a => a ? (a.no === 0 ? "前文" : "第" + a.no + "条") + (a.title ? "(" + a.title + ")" : "") : "(消えた条文)";
+const isSuspended = (a, today) => !!(a && a.suspended && today >= a.suspended.from && today <= a.suspended.until);
+
+/* ───────── 改正の手続き ───────── */
+const TYPES = { edit: "文を改める", add: "条を足す", del: "条を削る", kind: "理念/制度を変える", basis: "根拠を変える" };
+const QUESTIONS = {
+  seido: ["根拠の理念に、今より役立つか(どの理念に、どう役立つか)", "守れたかどうかを判定できる形になっているか(いつ・何を・どこまで)", "ほかの条文とぶつからないか", "体制のどこ(どの省・アプリ・タスク)に影響するか"],
+  rinen: ["今の理念を、いちばん強く擁護する文を書く", "変える理由は、その擁護に勝っているか", "根っこの出来事への見方が、本当に変わったのか", "一時の気分(焦り・疲れ・落ち込み)で変えようとしていないか", "この理念を根拠にしている制度は、どう変わるか"]
+};
+// 理念にかかわる改正は重い手続き(冷却が長く、議決は別の日に2回)
+function ruleOf(data, p){
+  const a = p.target ? byId(data, p.target) : null;
+  if (p.type === "add") return p.newKind === "理念" ? "rinen" : "seido";
+  if (p.type === "kind") return "rinen";
+  return a && a.kind === "理念" ? "rinen" : "seido";
+}
+const coolOf = (data, rule) => +(rule === "rinen" ? data.settings.coolRinen : data.settings.coolSeido) || 0;
+// 発議できるか(できなければ理由を返す)
+function proposeBlock(data, p, today){
+  const a = p.target ? byId(data, p.target) : null;
+  if (data.phase !== "enacted") return "まだ制定前です。草案のうちは、法典で直接直せます。";
+  if (p.type !== "add" && !a) return "改める条文を選んでください。";
+  if (a && a.root) return "根本の理念は改正できません。";
+  if (p.type === "basis" && a && a.kind !== "制度") return "根拠を持つのは制度の条文だけです。";
+  if (data.proposals.some(x => x.target && x.target === p.target && ["cooling", "deliberation", "vote1"].includes(x.status))) return "この条文には、審議中の改正案がもうあります。";
+  if (a) {
+    const rej = data.proposals.filter(x => x.target === a.id && x.status === "rejected" && x.decided).sort((x, y) => x.decided < y.decided ? 1 : -1)[0];
+    if (rej && daysBetween(rej.decided, today) < +data.settings.lock) return "この条文の改正案は " + md(rej.decided) + " に否決されたので、" + md(addDays(rej.decided, +data.settings.lock)) + " まで出し直せません。";
+    if (a.kind === "理念" && a.lastAmended && daysBetween(a.lastAmended, today) < 365) return "理念の同じ条文は、年に1回までしか改正できません(前回 " + a.lastAmended + ")。";
+  }
+  return "";
+}
+function newProposal(data, p, today){
+  const rule = ruleOf(data, p);
+  return Object.assign({ id: "p" + uid(), created: today, rule, coolUntil: addDays(today, coolOf(data, rule)), answers: {}, votes: [], status: "cooling", decided: null }, p);
+}
+// 中身を直したら、冷却はやり直し
+function editProposal(data, p, patch, today){ Object.assign(p, patch); p.rule = ruleOf(data, p); p.coolUntil = addDays(today, coolOf(data, p.rule)); p.status = "cooling"; p.votes = []; }
+function stageOf(p, today){
+  if (["passed", "rejected", "withdrawn"].includes(p.status)) return p.status;
+  if (today < p.coolUntil) return "cooling";
+  const qs = QUESTIONS[p.rule], done = qs.every((q, i) => String((p.answers || {})[i] || "").trim());
+  if (!done) return "deliberation";
+  return p.votes.length ? "vote2" : "vote1";
+}
+// 議決。制度は1回で可決、理念は別の日に2回
+function vote(data, p, yes, today){
+  const st = stageOf(p, today);
+  if (!["vote1", "vote2"].includes(st)) return "まだ議決できません(" + ({ cooling: md(p.coolUntil) + " まで冷却中", deliberation: "審議の問いにすべて答えてください" }[st] || "") + ")。";
+  if (!yes) { p.status = "rejected"; p.decided = today; return ""; }
+  if (p.rule === "rinen" && p.votes.length === 0) { p.votes.push(today); p.status = "vote1"; return "first"; }
+  if (p.rule === "rinen" && p.votes.includes(today)) return "2回目の議決は、別の日にしてください。";
+  p.votes.push(today); p.status = "passed"; p.decided = today;
+  promulgate(data, p, today);
+  return "";
+}
+// 公布:新しい版にする。翌日から施行。いつ・なぜ変えたかを残す
+function promulgate(data, p, today){
+  data.ver = (data.ver || 0) + 1;
+  const h = { ver: data.ver, date: today, effective: addDays(today, 1), propId: p.id, type: p.type, reason: p.reason || "", rule: p.rule };
+  let a = p.target ? byId(data, p.target) : null;
+  if (p.type === "edit") { h.before = { title: a.title, text: a.text }; h.after = { title: p.newTitle != null ? p.newTitle : a.title, text: p.newText };
+    if (p.trialDays && a.kind === "制度") { a.trial = { until: addDays(today, +p.trialDays), prev: clone(h.before), propId: p.id }; h.trial = +p.trialDays; }
+    a.title = h.after.title; a.text = h.after.text; }
+  else if (p.type === "add") { const no = p.newNo != null ? +p.newNo : Math.max(0, ...live(data).map(x => x.no)) + 1;
+    live(data).forEach(x => { if (p.newNo != null && x.no >= no) x.no++; });
+    a = { id: "a" + uid(), no, chapter: p.newChapter || "", title: p.newTitle || "", text: p.newText || "", kind: p.newKind || "制度", root: false, basis: (p.newBasis || []).slice(), created: today };
+    data.articles.push(a); h.after = { title: a.title, text: a.text }; }
+  else if (p.type === "del") { h.before = { title: a.title, text: a.text }; a.deleted = today;
+    data.articles.forEach(x => { if (x.basis) x.basis = x.basis.filter(b => b !== a.id); }); }
+  else if (p.type === "kind") { h.before = { kind: a.kind }; a.kind = p.newKind; if (a.kind === "理念") a.basis = []; h.after = { kind: a.kind }; }
+  else if (p.type === "basis") { h.before = { basis: (a.basis || []).slice() }; a.basis = (p.newBasis || []).slice(); h.after = { basis: a.basis.slice() }; }
+  h.target = a ? a.id : null; if (a) a.lastAmended = today;
+  data.history.push(h);
+  return h;
+}
+// 試行の期限が来たら、本採用にするか元に戻すかを決める
+function endTrial(data, a, keep, today){
+  if (!a || !a.trial) return;
+  if (!keep) { data.ver++; data.history.push({ ver: data.ver, date: today, effective: addDays(today, 1), type: "trialEnd", target: a.id, before: { title: a.title, text: a.text }, after: clone(a.trial.prev), reason: "試行の結果、元に戻した", rule: "seido" });
+    a.title = a.trial.prev.title; a.text = a.trial.prev.text; }
+  else data.history.push({ ver: data.ver, date: today, type: "trialKeep", target: a.id, reason: "試行の結果、本採用にした", rule: "seido" });
+  delete a.trial;
+}
+// 緊急の一時停止(制度だけ。上限の日数まで。過ぎたら自動で元に戻る)
+function suspend(data, a, days, reason, today){
+  if (!a || a.kind !== "制度") return "一時停止できるのは制度だけです。理念は停止できません。";
+  if (!String(reason || "").trim()) return "止める理由を書いてください。";
+  const n = Math.max(1, Math.min(+data.settings.susp || 14, Math.round(+days) || 1));
+  a.suspended = { from: today, until: addDays(today, n - 1), reason: String(reason).trim() };
+  data.history.push({ ver: data.ver, date: today, type: "suspend", target: a.id, reason: a.suspended.reason + "(" + n + "日間)", rule: "seido" });
+  return "";
+}
+
+/* ───────── 理念の深さ(7段階) ───────── */
+const LEVELS = ["知っている", "言える", "説明できる", "疑いをくぐった", "使っている", "証拠がある", "自然に出る"];
+function deepLevel(data, a){
+  const d = a.deep || {}, used = data.cases.some(c => (c.articles || []).includes(a.id)) || data.daily.some(x => x.articleId === a.id && x.result === "done");
+  const ok = [(a.readN || 0) > 0, !!d.recite, !!String(d.reason || "").trim(), !!(String(d.counter || "").trim() && String(d.answer || "").trim()), used, (d.evidence || []).length >= 3, !!d.natural];
+  let n = 0; while (n < ok.length && ok[n]) n++;
+  return n;
+}
+
+/* ───────── 審査のきっかけ ───────── */
+function triggers(data, today){
+  const out = [];
+  for (const a of live(data)) {
+    const br = data.breaches.filter(b => b.articleId === a.id && daysBetween(b.date, today) <= 90);
+    if (br.length >= 3) out.push({ a, kind: "breach", text: artLabel(a) + " を90日で" + br.length + "回破った" + (br.filter(b => b.cause === "rule").length >= 2 ? "(制度が合わないと答えたのが" + br.filter(b => b.cause === "rule").length + "回)" : "") });
+    if (a.kind === "制度" && a.review && a.review <= today) out.push({ a, kind: "review", text: artLabel(a) + " の見直しの日(" + md(a.review) + ")が来た" });
+    if (a.trial && a.trial.until <= today) out.push({ a, kind: "trial", text: artLabel(a) + " の試行の期限(" + md(a.trial.until) + ")が来た" });
+    if (a.suspended && a.suspended.until < today && !a.suspended.done) out.push({ a, kind: "suspEnd", text: artLabel(a) + " の一時停止が終わり、元に戻った" });
+    const bl = ((a.deep || {}).belief || []).slice(-3);
+    if (bl.length >= 2 && bl[bl.length - 1].v <= bl[0].v - 2) out.push({ a, kind: "belief", text: artLabel(a) + " を信じる度合いが下がっている(" + bl.map(x => x.v).join("→") + ")" });
+  }
+  return out;
+}
+
+/* ───────── 保存(ぶつかったら読み直して、同じ変更をかけ直す。変更は入力欄を読まない形で渡す) ───────── */
+const state = { conn: null, data: clone(DEFAULTS), sha: null, open: null, cview: "all", draftEdit: null, amendOpen: false, amendDraft: null, propEdit: null };
+function lsGet(k, fb){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
+function lsSet(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+const b64e = s => { const b = new TextEncoder().encode(s); let x = ""; for (let i = 0; i < b.length; i += 0x8000) x += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(x); };
+const b64d = s => { const bin = atob(String(s).replace(/\s/g, "")), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new TextDecoder().decode(u); };
+const api = p => "https://api.github.com/repos/" + encodeURIComponent(state.conn.owner) + "/" + encodeURIComponent(state.conn.repo) + "/contents/" + p;
+const hdr = x => Object.assign({ "Authorization": "Bearer " + state.conn.token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }, x || {});
+async function readData(){
+  const r = await fetch(api(DATA) + "?ref=" + encodeURIComponent(state.conn.branch || "main"), { headers: hdr(), cache: "no-store" });
+  if (r.status === 404) return { data: null, sha: null };
+  if (!r.ok) { const e = new Error("読み込めませんでした(" + r.status + ")"); e.status = r.status; throw e; }
+  const m = await r.json(); return { data: m.content ? JSON.parse(b64d(m.content)) : null, sha: m.sha };
+}
+async function writeData(obj, sha){
+  const body = { message: "kenseiin: 記録", content: b64e(JSON.stringify(obj, null, 1)), branch: state.conn.branch || "main" }; if (sha) body.sha = sha;
+  const r = await fetch(api(DATA), { method: "PUT", headers: hdr({ "Content-Type": "application/json" }), body: JSON.stringify(body) });
+  if (!r.ok) { const e = new Error("保存できませんでした(" + r.status + ")"); e.status = r.status; throw e; }
+  const o = await r.json(); return o.content && o.content.sha;
+}
+const norm = d => { const x = Object.assign(clone(DEFAULTS), d || {}); x.settings = Object.assign(clone(DEFAULTS.settings), (d && d.settings) || {}); return x; };
+async function commit(mutate){
+  const r0 = mutate(state.data); saveLocal(); renderAll();
+  if (!state.conn) return r0;
+  for (let i = 0; i < 3; i++) {
+    try { state.sha = await writeData(state.data, state.sha); saveLocal(); return r0; }
+    catch (err) {
+      if ((err.status === 409 || err.status === 422) && i < 2) { const f = await readData(); state.data = norm(f.data); state.sha = f.sha; mutate(state.data); continue; }
+      toast("保存できませんでした。つながったら開き直してください(" + err.message + ")"); return r0;
+    }
+  }
+  return r0;
+}
+function saveLocal(){ lsSet(KEY_LOCAL, { data: state.data }); }
+async function loadAll(){
+  const st = document.getElementById("conn-status"); if (st) { st.classList.remove("err"); st.textContent = "読み込んでいます…"; }
+  try { const r = await readData(); if (r.data) { state.data = norm(r.data); state.sha = r.sha; } else { state.sha = await writeData(state.data, null); }
+    saveLocal(); renderAll(); if (st) st.textContent = "読み込みました"; return true; }
+  catch (err) { if (st) { st.classList.add("err"); st.textContent = err.message; } return false; }
+}
+let toastT = null;
+function toast(t){ const el = document.getElementById("toast"); el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 3400); }
+const se = n => { try { SE.play(n); } catch (e) {} };
+const kindTag = a => a.kind === "理念" ? '<span class="kind rinen">理念・信じる</span>' : a.kind === "制度" ? '<span class="kind seido">制度・守る</span>' : '<span class="kind none">未分類</span>';
+
+/* ───────── 今日 ───────── */
+function todayPick(data, today){
+  const done = data.daily.find(x => x.date === today); if (done) return byId(data, done.articleId);
+  const ls = live(data), pool = ls.filter(a => a.kind === "理念").length ? ls.filter(a => a.kind === "理念") : ls;
+  return pool.slice().sort((a, b) => String(a.lastRead || "").localeCompare(String(b.lastRead || "")) || a.no - b.no)[0] || null;
+}
+function renderToday(){
+  const d = state.data, today = taskDay();
+  document.getElementById("today-sub").innerHTML = md(today) + "<br>" + (d.phase === "enacted" ? "第" + d.ver + "版" : "制定前(草案)");
+  const al = [];
+  if (d.phase !== "enacted") al.push('<div class="alert"><b>まだ制定前です。</b>法典で本文を取り込み、理念と制度に分けてから、制定してください。</div>');
+  const last = d.reviews.slice(-1)[0], due = d.phase === "enacted" && (!last || daysBetween(last.date, today) >= +d.settings.review);
+  if (due) al.push('<div class="alert"><b>審査の日です。</b>' + (last ? "前回 " + md(last.date) + "。" : "") + '<button type="button" class="linkbtn" data-go="review">審査を開く</button></div>');
+  const ready = d.proposals.filter(p => ["vote1", "vote2"].includes(stageOf(p, today)) && !(p.rule === "rinen" && p.votes.includes(today)));
+  if (ready.length) al.push('<div class="alert"><b>議決できる改正案が ' + ready.length + "件あります。</b>" + '<button type="button" class="linkbtn" data-go="amend">改正を開く</button></div>');
+  const tg = triggers(d, today).filter(t => t.kind === "trial");
+  if (tg.length) al.push('<div class="alert red"><b>試行の期限:</b>' + tg.map(t => esc(t.text)).join("、") + '<button type="button" class="linkbtn" data-go="review">審査で決める</button></div>');
+  document.getElementById("today-alerts").innerHTML = al.join("");
+  const card = document.getElementById("today-card"), a = todayPick(d, today), rec = d.daily.find(x => x.date === today);
+  if (!a) { card.innerHTML = "<h2>今日の条文</h2><p class=\"note\">条文がまだありません。</p>"; }
+  else {
+    card.innerHTML = "<h2>今日の条文<small>" + (a.kind === "理念" ? "信じるもの" : "守るもの") + "</small></h2>" +
+      '<div class="art-h"><span class="art-no">' + esc(artLabel(a)) + "</span>" + kindTag(a) + (a.root ? '<span class="root">根本</span>' : "") + "</div>" +
+      '<div class="today-art">' + esc(a.text) + "</div>" +
+      (a.kind === "理念" ? ladderHtml(d, a) + (((a.deep || {}).reason) ? '<p class="note">あなたの言葉:' + esc(a.deep.reason) + "</p>" : "") : "") +
+      (!rec ? '<div class="f"><label for="plan-in">今日、これをどう生かすか</label><input id="plan-in" maxlength="120" placeholder="例:迷ったら、楽なほうではなく…"></div><button type="button" class="btn sm" data-plan-save="' + esc(a.id) + '">決めた</button>'
+        : '<p style="margin:.3rem 0">今日の決めごと:<b>' + esc(rec.plan) + "</b></p>" +
+          (rec.result ? '<p class="note">' + ({ done: "生かせた ✓", part: "少し生かせた", no: "生かせなかった" }[rec.result]) + "</p>"
+            : '<div class="note">夜に、生かせたかを答える</div><div class="ans"><button type="button" class="btn sm" data-day-ans="done">生かせた</button><button type="button" class="btn ghost sm" data-day-ans="part">少し</button><button type="button" class="btn ghost sm" data-day-ans="no">生かせなかった</button></div>'));
+  }
+  const bc = document.getElementById("breach-card"), seidos = live(d).filter(x => x.kind === "制度" && !isSuspended(x, today)), todays = d.breaches.filter(b => b.date === today);
+  bc.innerHTML = "<h2>破った制度を記録する<small>責めるためではなく、直すために</small></h2>" +
+    (seidos.length ? '<div class="f"><label for="br-art">どの制度か</label><select id="br-art">' + seidos.map(x => '<option value="' + esc(x.id) + '">' + esc(artLabel(x)) + "</option>").join("") + "</select></div>" +
+      '<div class="f"><label for="br-why">なぜ破ったか(一言)</label><input id="br-why" maxlength="120"></div>' +
+      '<div class="f"><label for="br-cause">原因は</label><select id="br-cause"><option value="weak">自分が弱かった(是正する)</option><option value="rule">制度が合わなかった(改正を考える)</option><option value="unk">わからない</option></select></div>' +
+      '<button type="button" class="btn ghost sm" data-breach>記録する</button>' : '<p class="note">制度の条文がまだありません。</p>') +
+    (todays.length ? '<div style="margin-top:.5rem">' + todays.map(b => '<div class="item">' + esc(artLabel(byId(d, b.articleId))) + "<br><small>" + esc(b.reason) + "・" + ({ weak: "自分が弱かった", rule: "制度が合わなかった", unk: "わからない" }[b.cause]) + "</small></div>").join("") + "</div>" : "");
+}
+function ladderHtml(data, a){ const n = deepLevel(data, a); return '<div class="ladder" title="信じる深さ">' + LEVELS.map((l, i) => '<span class="' + (i < n ? "on" : "") + '">' + (i + 1) + "<br>" + l + "</span>").join("") + "</div>"; }
+
+/* ───────── 法典 ───────── */
+function renderCode(){
+  const d = state.data, ls = live(d), today = taskDay();
+  document.getElementById("code-sub").innerHTML = d.phase === "enacted" ? "第" + d.ver + "版<br>" + md(d.enactedAt) + " 制定" : "制定前(草案)";
+  const top = document.getElementById("code-top");
+  if (d.phase !== "enacted") {
+    const un = ls.filter(a => !a.kind).length, noBasis = ls.filter(a => a.kind === "制度" && !(a.basis || []).length).length;
+    top.innerHTML = '<div class="card"><h2>草案<small>制定するまでは、ここで直接直せます</small></h2>' +
+      '<div class="f"><label for="imp">憲法の本文を貼り付けて取り込む(「第◯章」「第◯条」で分けます)</label><textarea id="imp" rows="5" placeholder="第1条(理念)…"></textarea></div>' +
+      '<div class="row"><button type="button" class="btn sm" data-import>取り込む</button><button type="button" class="btn ghost sm" data-add-draft>条を1つ足す</button></div>' +
+      (ls.length ? '<p class="note">' + ls.length + "条。未分類 " + un + "条・根拠のない制度 " + noBasis + "条。条を押すと、理念/制度・根本・根拠を決められます。</p>" +
+        '<button type="button" class="btn gold" data-enact' + (un ? " disabled" : "") + ">制定する</button>" + (un ? '<p class="lock">すべての条を理念か制度に分けると、制定できます。</p>' : "") : "") + "</div>";
+  } else top.innerHTML = "";
+  renderDetail();
+  document.querySelectorAll("#code-seg [data-cview]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cview === state.cview)));
+  const box = document.getElementById("code-list");
+  if (state.cview === "hist") {
+    box.innerHTML = d.history.length ? d.history.slice().reverse().map(h => { const a = byId(d, h.target);
+      return '<div class="hist"><b>' + (h.type === "enact" ? "制定" : "第" + h.ver + "版") + "</b> " + md(h.date) + " " + esc(h.type === "enact" ? "憲法を制定" : (TYPES[h.type] || { trialEnd: "試行を取りやめ", trialKeep: "試行を本採用", suspend: "一時停止" }[h.type] || h.type) + " " + artLabel(a)) +
+        (h.reason ? '<br><span class="note">理由:' + esc(h.reason) + "</span>" : "") + "</div>"; }).join("") : '<p class="note">まだ歴史はありません。</p>';
+    return;
+  }
+  const list = state.cview === "rinen" ? ls.filter(a => a.kind === "理念") : state.cview === "seido" ? ls.filter(a => a.kind === "制度") : ls;
+  let html = "", ch = null;
+  for (const a of list) {
+    if (state.cview === "all" && a.chapter !== ch) { ch = a.chapter; if (ch) html += '<div class="chap">' + esc(ch) + "</div>"; }
+    const susp = isSuspended(a, today);
+    html += '<div class="art' + (susp ? " susp" : "") + '" data-open="' + esc(a.id) + '"><div class="art-h"><span class="art-no">' + esc(artLabel(a)) + "</span>" + kindTag(a) + (a.root ? '<span class="root">根本</span>' : "") +
+      (susp ? '<span class="tag warn">一時停止中(' + md(a.suspended.until) + "まで)</span>" : "") + (a.trial ? '<span class="tag warn">試行中(' + md(a.trial.until) + "まで)</span>" : "") +
+      (a.kind === "理念" ? '<span class="tag">深さ ' + deepLevel(d, a) + "/7</span>" : "") + "</div>" +
+      '<div class="art-t">' + esc(a.text) + "</div>" +
+      (a.kind === "制度" ? '<div class="art-basis">根拠:' + ((a.basis || []).map(b => esc(artLabel(byId(d, b)))).join("・") || "<span style=\"color:var(--red)\">まだ結びついていない</span>") + (a.review ? "　見直し " + md(a.review) : "") + "</div>" : "") + "</div>";
+  }
+  box.innerHTML = html || '<p class="note">' + (ls.length ? "当てはまる条文はありません。" : "まだ条文がありません。上の草案の欄に、憲法の本文を貼り付けて取り込んでください。") + "</p>";
+}
+function renderDetail(){
+  const d = state.data, box = document.getElementById("code-detail"), a = state.open && byId(d, state.open), today = taskDay();
+  if (!a) { box.innerHTML = ""; return; }
+  const draft = d.phase !== "enacted", rinens = live(d).filter(x => x.kind === "理念" && x.id !== a.id);
+  let h = '<div class="detail"><div class="row" style="justify-content:space-between"><h3>' + esc(artLabel(a)) + " " + kindTag(a) + (a.root ? ' <span class="root">根本</span>' : "") + '</h3><button type="button" class="linkbtn" data-close>閉じる</button></div>';
+  if (draft) {
+    h += '<div class="grid2"><div class="f"><label>条の番号</label><input id="dr-no" type="number" min="0" value="' + a.no + '"></div><div class="f"><label>章</label><input id="dr-ch" value="' + esc(a.chapter || "") + '"></div><div class="f"><label>見出し</label><input id="dr-title" value="' + esc(a.title || "") + '"></div></div>' +
+      '<div class="f"><label>本文</label><textarea id="dr-text" rows="4">' + esc(a.text) + "</textarea></div>" +
+      '<div class="f"><label>理念(信じるもの)か、制度(守るもの)か</label><select id="dr-kind"><option value="">未分類</option><option' + (a.kind === "理念" ? " selected" : "") + '>理念</option><option' + (a.kind === "制度" ? " selected" : "") + ">制度</option></select></div>" +
+      '<label class="note" style="display:flex;gap:.4rem;align-items:center"><input type="checkbox" id="dr-root"' + (a.root ? " checked" : "") + "> 根本の理念にする(制定したあと、改正できなくなる)</label>" +
+      '<div class="f"><label>制度の根拠(どの理念のためか)</label>' + (rinens.length ? rinens.map(x => '<label class="note" style="display:flex;gap:.4rem"><input type="checkbox" data-dr-basis="' + esc(x.id) + '"' + ((a.basis || []).includes(x.id) ? " checked" : "") + "> " + esc(artLabel(x)) + "</label>").join("") : '<p class="note">理念の条がまだありません。</p>') + "</div>" +
+      '<div class="f"><label>見直しの日(制度)</label><input id="dr-review" type="date" value="' + esc(a.review || "") + '"></div>' +
+      '<div class="row"><button type="button" class="btn sm" data-dr-save="' + esc(a.id) + '">保存する</button><button type="button" class="linkbtn del" data-dr-del="' + esc(a.id) + '">この条を消す</button></div>';
+  } else {
+    h += '<div class="art-t">' + esc(a.text) + "</div>";
+    if (a.kind === "制度") {
+      h += '<div class="art-basis">根拠:' + ((a.basis || []).map(b => esc(artLabel(byId(d, b)))).join("・") || "まだ結びついていない(改正の「根拠を変える」で結びつける)") + "</div>" +
+        '<div class="f" style="max-width:14rem"><label>見直しの日(点検の日。本文ではないので、いつでも変えられる)</label><input id="rv-date" type="date" value="' + esc(a.review || "") + '"></div><button type="button" class="btn ghost sm" data-rv-save="' + esc(a.id) + '">見直しの日を保存</button>';
+      if (isSuspended(a, today)) h += '<p class="lock">一時停止中(' + md(a.suspended.until) + "まで):" + esc(a.suspended.reason) + "。その間に、正式な改正を始めてください。</p>";
+      else h += '<details style="margin-top:.6rem"><summary class="note">緊急の一時停止</summary><p class="note">この制度が今すぐ害になるときだけ。最大' + d.settings.susp + "日で、過ぎたら自動で元に戻ります。</p>" +
+        '<div class="grid2"><div class="f"><label>日数</label><input id="sp-days" type="number" min="1" max="' + d.settings.susp + '" value="7"></div></div><div class="f"><label>理由</label><input id="sp-why"></div><button type="button" class="btn red sm" data-suspend="' + esc(a.id) + '">一時停止する</button></details>';
+    }
+    if (a.kind === "理念") {
+      const dp = a.deep || {};
+      h += ladderHtml(d, a) + '<div class="deep"><p class="note">本文は改正でしか変わりませんが、ここに書くことは、信じるための自分のノートです。いつでも書き足せます。</p>' +
+        "<h4>なぜ大切か(自分の言葉で)</h4><div class=\"f\"><textarea id=\"dp-reason\" rows=\"3\">" + esc(dp.reason || "") + "</textarea></div>" +
+        "<h4>根っこの出来事</h4><div class=\"f\"><textarea id=\"dp-origin\" rows=\"3\">" + esc(dp.origin || "") + "</textarea></div>" +
+        "<h4>いちばん強い反論</h4><div class=\"f\"><textarea id=\"dp-counter\" rows=\"2\">" + esc(dp.counter || "") + "</textarea></div>" +
+        "<h4>それでも信じる理由(反論への答え)</h4><div class=\"f\"><textarea id=\"dp-answer\" rows=\"3\">" + esc(dp.answer || "") + "</textarea></div>" +
+        '<label class="note" style="display:flex;gap:.4rem"><input type="checkbox" id="dp-recite"' + (dp.recite ? " checked" : "") + '> 何も見ずに言える</label><label class="note" style="display:flex;gap:.4rem"><input type="checkbox" id="dp-natural"' + (dp.natural ? " checked" : "") + "> 迷ったとき、考える前に真っ先に浮かぶ</label>" +
+        '<button type="button" class="btn sm" data-dp-save="' + esc(a.id) + '">ノートを保存</button>' +
+        "<h4>証拠(この理念に従ってよかった経験)</h4>" + ((dp.evidence || []).map(e => '<div class="ev"><small>' + md(e.date) + "</small>" + esc(e.text) + "</div>").join("") || '<p class="note">まだありません。</p>') +
+        '<div class="row"><input id="ev-in" style="flex:1;min-width:10rem;padding:.35rem .5rem;border:1px solid var(--rule);border-radius:4px"><button type="button" class="btn ghost sm" data-ev-add="' + esc(a.id) + '">足す</button></div>' +
+        "<h4>今、どのくらい信じているか</h4><div class=\"ans\">" + [1, 2, 3, 4, 5].map(n => '<button type="button" class="btn ghost sm" data-belief="' + esc(a.id) + ":" + n + '">' + n + "</button>").join("") + "</div>" +
+        '<p class="note">' + ((dp.belief || []).slice(-6).map(x => md(x.date) + " " + x.v).join("・") || "まだ記録がありません") + "(5がいちばん強い)</p></div>";
+    }
+    const hs = d.history.filter(x => x.target === a.id);
+    if (hs.length) h += "<h4 style=\"font-size:.86rem;margin:.8rem 0 .2rem\">この条の改正</h4>" + hs.slice().reverse().map(x => '<div class="hist">' + md(x.date) + " " + esc(TYPES[x.type] || x.type) + (x.reason ? "・" + esc(x.reason) : "") + "</div>").join("");
+    if (!a.root) h += '<div style="margin-top:.6rem"><button type="button" class="btn ghost sm" data-propose="' + esc(a.id) + '">この条の改正案を出す</button></div>';
+  }
+  box.innerHTML = h + "</div>";
+}
+
+/* ───────── 改正 ───────── */
+const STAGES = [["cooling", "冷却"], ["deliberation", "審議"], ["vote1", "議決"], ["vote2", "2回目の議決"], ["passed", "公布"]];
+function renderAmend(){
+  const d = state.data, today = taskDay(), f = document.getElementById("amend-form");
+  if (d.phase !== "enacted") { f.innerHTML = '<div class="card"><p class="note">制定してから、改正の手続きが使えます。制定前は、法典で直接直せます。</p></div>'; document.getElementById("amend-list").innerHTML = ""; return; }
+  const x = state.amendDraft || { type: "edit", target: (live(d).find(a => !a.root) || {}).id || "" };
+  const tgt = x.target && byId(d, x.target), ls = live(d), rinens = ls.filter(a => a.kind === "理念");
+  if (!state.amendOpen) f.innerHTML = '<div class="row" style="margin-bottom:1rem"><button type="button" class="btn" data-amend-open>改正案を出す</button></div>';
+  else {
+    const rule = ruleOf(d, x), block = proposeBlock(d, x, today);
+    f.innerHTML = '<div class="card"><h2>改正案を出す<small>' + (rule === "rinen" ? "理念にかかわる重い手続き:冷却" + d.settings.coolRinen + "日・議決2回" : "制度の手続き:冷却" + d.settings.coolSeido + "日・議決1回") + "</small></h2>" +
+      '<div class="grid2"><div class="f"><label>何をするか</label><select id="am-type">' + Object.entries(TYPES).map(([k, v]) => '<option value="' + k + '"' + (k === x.type ? " selected" : "") + ">" + v + "</option>").join("") + "</select></div>" +
+      (x.type !== "add" ? '<div class="f"><label>どの条文か</label><select id="am-target">' + ls.map(a => '<option value="' + esc(a.id) + '"' + (a.id === x.target ? " selected" : "") + ">" + esc(artLabel(a)) + (a.root ? "(根本)" : "") + "</option>").join("") + "</select></div>" : "") + "</div>" +
+      (x.type === "edit" && tgt ? '<div class="f"><label>新しい見出し</label><input id="am-title" value="' + esc(x.newTitle != null ? x.newTitle : tgt.title || "") + '"></div><div class="f"><label>新しい本文</label><textarea id="am-text" rows="4">' + esc(x.newText != null ? x.newText : tgt.text) + "</textarea></div>" +
+        (tgt.kind === "制度" ? '<div class="f" style="max-width:14rem"><label>試行にする日数(空なら本採用)</label><input id="am-trial" type="number" min="1" max="180" placeholder="例:' + d.settings.trial + '" value="' + esc(x.trialDays || "") + '"></div>' : "") : "") +
+      (x.type === "add" ? '<div class="grid2"><div class="f"><label>種類</label><select id="am-kind"><option' + (x.newKind === "理念" ? " selected" : "") + ">理念</option><option" + (x.newKind !== "理念" ? " selected" : "") + '>制度</option></select></div><div class="f"><label>条の番号(空なら最後)</label><input id="am-no" type="number" min="1" value="' + esc(x.newNo != null ? x.newNo : "") + '"></div><div class="f"><label>章</label><input id="am-ch" value="' + esc(x.newChapter || "") + '"></div></div>' +
+        '<div class="f"><label>見出し</label><input id="am-title" value="' + esc(x.newTitle || "") + '"></div><div class="f"><label>本文</label><textarea id="am-text" rows="4">' + esc(x.newText || "") + "</textarea></div>" : "") +
+      (x.type === "kind" && tgt ? '<div class="f"><label>変えたあと</label><select id="am-kind"><option' + (tgt.kind === "制度" ? " selected" : "") + ">理念</option><option" + (tgt.kind === "理念" ? " selected" : "") + ">制度</option></select></div>" : "") +
+      ((x.type === "basis" || (x.type === "add" && x.newKind !== "理念")) ? '<div class="f"><label>根拠の理念</label>' + rinens.map(r => '<label class="note" style="display:flex;gap:.4rem"><input type="checkbox" data-am-basis="' + esc(r.id) + '"' + ((x.newBasis || (tgt && tgt.basis) || []).includes(r.id) ? " checked" : "") + "> " + esc(artLabel(r)) + "</label>").join("") + "</div>" : "") +
+      '<div class="f"><label>理由</label><textarea id="am-reason" rows="2">' + esc(x.reason || "") + '</textarea></div><div class="f"><label>根拠になる記録(判例・破った記録・点検の結果など)</label><textarea id="am-grounds" rows="2">' + esc(x.grounds || "") + "</textarea></div>" +
+      (block ? '<p class="lock">' + esc(block) + "</p>" : "") +
+      '<div class="row"><button type="button" class="btn" data-amend-submit' + (block ? " disabled" : "") + '>発議する</button><button type="button" class="btn ghost" data-amend-x>やめる</button></div></div>';
+  }
+  const ps = d.proposals.slice().sort((a, b) => (["passed", "rejected", "withdrawn"].includes(a.status) ? 1 : 0) - (["passed", "rejected", "withdrawn"].includes(b.status) ? 1 : 0) || (a.created < b.created ? 1 : -1));
+  document.getElementById("amend-list").innerHTML = ps.length ? ps.map(p => propHtml(d, p, today)).join("") : '<p class="note">改正案はまだありません。</p>';
+}
+function propHtml(d, p, today){
+  const a = p.target ? byId(d, p.target) : null, st = stageOf(p, today), qs = QUESTIONS[p.rule], fin = ["passed", "rejected", "withdrawn"].includes(st);
+  const idx = { cooling: 0, deliberation: 1, vote1: 2, vote2: 3, passed: 4 }[st];
+  const steps = p.rule === "rinen" ? STAGES : STAGES.filter(s => s[0] !== "vote2");
+  let h = '<div class="prop' + (p.rule === "rinen" ? " heavy" : "") + '"><div class="prop-h"><b>' + esc(TYPES[p.type]) + " " + esc(p.type === "add" ? "新しい条(" + (p.newKind || "制度") + ")" : artLabel(a)) + "</b>" +
+    '<span class="kind ' + (p.rule === "rinen" ? "rinen" : "seido") + '">' + (p.rule === "rinen" ? "理念の手続き" : "制度の手続き") + '</span><span class="note">' + md(p.created) + " 発議</span></div>";
+  if (st === "rejected") h += '<p class="lock">否決(' + md(p.decided) + ")</p>"; else if (st === "withdrawn") h += '<p class="note">取り下げ</p>';
+  else h += '<div class="stage">' + steps.map(([k, l]) => { const i = { cooling: 0, deliberation: 1, vote1: 2, vote2: 3, passed: 4 }[k]; return '<span class="' + (i === idx ? "on" : i < idx ? "done" : "") + '">' + l + "</span>"; }).join("") + "</div>";
+  if (p.type === "edit" && a) { const hh = d.history.find(x => x.propId === p.id), before = hh ? hh.before : a; h += '<div class="diff"><div class="old"><small>' + (st === "passed" ? "前の文" : "今の文") + "</small>" + esc(before.text) + '</div><div class="new"><small>新しい文' + (p.trialDays ? "(試行" + p.trialDays + "日)" : "") + "</small>" + esc(p.newText) + "</div></div>"; }
+  if (p.type === "add") h += '<div class="diff"><div class="old"><small>今</small>(なし)</div><div class="new"><small>足す条</small>' + esc((p.newTitle ? "(" + p.newTitle + ")" : "") + p.newText) + "</div></div>";
+  if (p.type === "kind") h += '<p class="note">' + esc(a ? a.kind : "") + " → " + esc(p.newKind) + "</p>";
+  if (p.type === "basis") h += '<p class="note">新しい根拠:' + ((p.newBasis || []).map(b => esc(artLabel(byId(d, b)))).join("・") || "なし") + "</p>";
+  if (p.type === "del" && a) h += '<div class="diff"><div class="old"><small>削る条</small>' + esc(a.text) + '</div><div class="new"><small>あと</small>(なし)</div></div>';
+  h += '<p class="note">理由:' + esc(p.reason || "") + (p.grounds ? "<br>根拠:" + esc(p.grounds) : "") + "</p>";
+  if (!fin) {
+    if (st === "cooling") h += '<p class="note">冷却中。<b>' + md(p.coolUntil) + "</b> から審議できます。案を直すと、冷却はやり直しになります。</p>";
+    if (state.propEdit === p.id) h += '<div class="f"><label>新しい中身(本文)</label><textarea id="pe-text" rows="4">' + esc(p.newText || "") + '</textarea></div><div class="f"><label>理由</label><textarea id="pe-reason" rows="2">' + esc(p.reason || "") + '</textarea></div><div class="row"><button type="button" class="btn sm" data-pe-save="' + esc(p.id) + '">直す(冷却はやり直し)</button><button type="button" class="btn ghost sm" data-pe-x>やめる</button></div>';
+    if (st !== "cooling") h += qs.map((q, i) => '<div class="q"><label>' + (i + 1) + ". " + esc(q) + '</label><textarea rows="2" data-ans-q="' + esc(p.id) + ":" + i + '"' + (p.votes.length ? " disabled" : "") + ">" + esc((p.answers || {})[i] || "") + "</textarea></div>").join("") +
+      (p.votes.length ? "" : '<button type="button" class="btn ghost sm" data-ans-save="' + esc(p.id) + '">答えを保存</button>');
+    if (st === "vote1" || st === "vote2") h += '<div class="row" style="margin-top:.5rem">' + (p.rule === "rinen" && p.votes.includes(today) ? '<p class="note">1回目の議決は済みました(' + md(p.votes[0]) + ")。2回目は別の日に。</p>"
+      : '<button type="button" class="btn gold" data-vote="' + esc(p.id) + ':yes">' + (st === "vote2" ? "2回目の議決:可決して公布" : p.rule === "rinen" ? "1回目の議決:賛成" : "可決して公布") + '</button><button type="button" class="btn ghost" data-vote="' + esc(p.id) + ':no">否決</button>') + "</div>";
+    h += '<div class="row" style="margin-top:.4rem">' + (["cooling", "deliberation"].includes(st) && p.type !== "del" && p.type !== "kind" && p.type !== "basis" ? '<button type="button" class="linkbtn" data-pe="' + esc(p.id) + '">案を直す</button>' : "") + '<button type="button" class="linkbtn del" data-withdraw="' + esc(p.id) + '">取り下げる</button></div>';
+  } else if (st === "passed") { const hh = d.history.find(x => x.propId === p.id); h += '<p class="note">' + md(p.decided) + " 公布・" + (hh ? md(hh.effective) : "") + " 施行(第" + (hh ? hh.ver : "") + "版)</p>"; }
+  return h + "</div>";
+}
+
+/* ───────── 判例 ───────── */
+function renderCases(){
+  const d = state.data, ls = live(d);
+  document.getElementById("case-form").innerHTML = "<h2>憲法に聞く<small>迷った場面と、どう決めたか</small></h2>" +
+    '<div class="f"><label for="cs-sit">迷った場面</label><textarea id="cs-sit" rows="2"></textarea></div>' +
+    '<div class="f"><label>関係する条文</label>' + (ls.length ? ls.map(a => '<label class="note" style="display:flex;gap:.4rem"><input type="checkbox" data-cs-art="' + esc(a.id) + '"> ' + esc(artLabel(a)) + " " + (a.kind ? "(" + a.kind + ")" : "") + "</label>").join("") : '<p class="note">条文がまだありません。</p>') + "</div>" +
+    '<div class="f"><label for="cs-dec">どう決めたか</label><textarea id="cs-dec" rows="2"></textarea></div><div class="f"><label for="cs-why">なぜ(条文をどう読んだか)</label><textarea id="cs-why" rows="2"></textarea></div>' +
+    '<button type="button" class="btn sm" data-case-add>判例として残す</button>';
+  document.getElementById("case-list").innerHTML = d.cases.slice().reverse().map(c => '<div class="card"><div class="note">' + md(c.date) + "・" + (c.articles || []).map(x => esc(artLabel(byId(d, x)))).join("・") + "</div>" +
+    "<p style=\"margin:.2rem 0\"><b>場面:</b>" + esc(c.situation) + "</p><p style=\"margin:.2rem 0\"><b>決めたこと:</b>" + esc(c.decision) + "</p>" + (c.reason ? '<p class="note">' + esc(c.reason) + "</p>" : "") +
+    (c.eval ? '<p class="note">振り返り:' + (c.eval === "good" ? "よかった" : "まずかった") + (c.evalNote ? "・" + esc(c.evalNote) : "") + "</p>"
+      : '<div class="ans"><button type="button" class="btn ghost sm" data-case-eval="' + esc(c.id) + ':good">あとで見て、よかった</button><button type="button" class="btn ghost sm" data-case-eval="' + esc(c.id) + ':bad">まずかった</button></div>') + "</div>").join("") || '<p class="note">まだ判例はありません。</p>';
+}
+
+/* ───────── 審査 ───────── */
+function renderReview(){
+  const d = state.data, today = taskDay(), last = d.reviews.slice(-1)[0], since = last ? last.date : "0000";
+  document.getElementById("review-sub").innerHTML = last ? "前回 " + md(last.date) + "<br>次は " + md(addDays(last.date, +d.settings.review)) : "まだ開いていません";
+  if (d.phase !== "enacted") { document.getElementById("review-body").innerHTML = '<div class="card"><p class="note">制定してから、審査が使えます。</p></div>'; return; }
+  const tg = triggers(d, today), br = d.breaches.filter(b => b.date > since), ue = d.cases.filter(c => !c.eval), act = d.proposals.filter(p => !["passed", "rejected", "withdrawn"].includes(p.status));
+  const dl = d.daily.filter(x => x.date > since && x.result), dlDone = dl.filter(x => x.result === "done").length;
+  document.getElementById("review-body").innerHTML =
+    '<div class="card"><h2>改正のきっかけ<small>' + tg.length + "件</small></h2>" + (tg.map(t => '<div class="item">' + esc(t.text) + '<div class="row" style="margin-top:.2rem">' +
+      (t.kind === "trial" ? '<button type="button" class="btn sm" data-trial="' + esc(t.a.id) + ':keep">本採用にする</button><button type="button" class="btn ghost sm" data-trial="' + esc(t.a.id) + ':back">元に戻す</button>'
+        : t.kind === "review" ? '<button type="button" class="btn ghost sm" data-rv-ok="' + esc(t.a.id) + '">点検した:まだ役立つ(次は90日後)</button><button type="button" class="linkbtn" data-propose="' + esc(t.a.id) + '">改正案を出す</button>'
+        : t.kind === "suspEnd" ? '<button type="button" class="btn ghost sm" data-susp-ok="' + esc(t.a.id) + '">確認した</button>'
+        : '<button type="button" class="linkbtn" data-propose="' + esc(t.a.id) + '">改正案を出す</button><button type="button" class="linkbtn" data-open-art="' + esc(t.a.id) + '">条文を見る</button>') + "</div></div>").join("") || '<p class="note">今はありません。</p>') + "</div>" +
+    '<div class="card"><h2>前回からの記録</h2><p class="note">今日の条文を生かせた日 ' + dlDone + " / " + dl.length + "日・破った制度 " + br.length + "件・振り返っていない判例 " + ue.length + "件・審議中の改正案 " + act.length + "件</p>" +
+      br.map(b => '<div class="item">' + md(b.date) + " " + esc(artLabel(byId(d, b.articleId))) + "<br><small>" + esc(b.reason) + "・" + ({ weak: "自分が弱かった → 是正", rule: "制度が合わなかった → 改正を考える", unk: "わからない → ここで見分ける" }[b.cause]) + "</small></div>").join("") + "</div>" +
+    '<div class="card"><h2>審査を終える</h2><p class="note">破った記録は「自分が弱かったのか、制度が悪かったのか」を見分け、前者は是正、後者は改正へ。</p><div class="f"><label for="rv-memo">今回の結論(是正すること・改正を考えること)</label><textarea id="rv-memo" rows="3"></textarea></div><button type="button" class="btn gold" data-review-done>審査を終える</button></div>' +
+    (d.reviews.length ? '<div class="card"><h2>これまでの審査</h2>' + d.reviews.slice().reverse().map(r => '<div class="hist">' + md(r.date) + " " + esc(r.memo || "") + "</div>").join("") + "</div>" : "");
+}
+function renderSet(){
+  const s = state.data.settings, set = (id, v) => { const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = v; };
+  set("s-cs", s.coolSeido); set("s-cr", s.coolRinen); set("s-trial", s.trial); set("s-susp", s.susp); set("s-lock", s.lock); set("s-rev", s.review);
+}
+function renderAll(){ renderToday(); renderCode(); renderAmend(); renderCases(); renderReview(); renderSet(); }
+
+/* ───────── 操作(入力欄の値は、押した瞬間に読み取ってから変更を渡す) ───────── */
+const val = id => { const el = document.getElementById(id); return el ? el.value : ""; };
+function showView(name){
+  document.querySelectorAll(".view").forEach(v => v.hidden = v.id !== "view-" + name);
+  document.querySelectorAll("nav.tabs button").forEach(x => x.setAttribute("aria-selected", String(x.dataset.view === name))); window.scrollTo(0, 0);
+}
+function readAmend(){
+  const x = Object.assign({}, state.amendDraft || {});
+  if (document.getElementById("am-type")) x.type = val("am-type");
+  if (document.getElementById("am-target")) x.target = val("am-target");
+  if (x.type === "add") x.target = null;
+  if (document.getElementById("am-title")) x.newTitle = val("am-title");
+  if (document.getElementById("am-text")) x.newText = val("am-text");
+  if (document.getElementById("am-kind")) x.newKind = val("am-kind");
+  if (document.getElementById("am-trial")) x.trialDays = val("am-trial") ? Math.round(+val("am-trial")) : null;
+  if (document.getElementById("am-no")) x.newNo = val("am-no") === "" ? null : +val("am-no");
+  if (document.getElementById("am-ch")) x.newChapter = val("am-ch");
+  const bs = document.querySelectorAll("[data-am-basis]"); if (bs.length) x.newBasis = Array.from(bs).filter(b => b.checked).map(b => b.dataset.amBasis);
+  x.reason = val("am-reason"); x.grounds = val("am-grounds");
+  return x;
+}
+function bind(){
+  document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => showView(b.dataset.view)));
+  document.body.addEventListener("change", e => {
+    if (["am-type", "am-target", "am-kind"].includes(e.target.id)) { const x = readAmend(); if (e.target.id !== "am-kind") { delete x.newText; delete x.newTitle; delete x.newBasis; } state.amendDraft = x; renderAmend(); }
+  });
+  document.body.addEventListener("click", async e => {
+    const q = s => e.target.closest(s); let b; const today = taskDay();
+    if ((b = q("[data-go]"))) return showView(b.dataset.go);
+    // 今日
+    if ((b = q("[data-plan-save]"))) { const id = b.dataset.planSave, plan = val("plan-in").trim(); if (!plan) { toast("今日どう生かすかを書いてください"); return; }
+      const rid = "d" + uid(), at = Date.now();
+      await commit(d => { if (d.daily.some(x => x.date === today)) return; d.daily.push({ id: rid, date: today, articleId: id, plan, at }); const a = byId(d, id); if (a) { a.readN = (a.readN || 0) + 1; a.lastRead = today; } });
+      se("save"); return; }
+    if ((b = q("[data-day-ans]"))) { const v = b.dataset.dayAns; await commit(d => { const r = d.daily.find(x => x.date === today); if (r && !r.result) r.result = v; }); se(v === "done" ? "levelup" : v === "part" ? "save" : "down"); return; }
+    if (q("[data-breach]")) { const id = val("br-art"), why = val("br-why").trim(), cause = val("br-cause"); if (!why) { toast("なぜ破ったかを一言書いてください"); return; }
+      const rid = "b" + uid(); await commit(d => { d.breaches.push({ id: rid, date: today, articleId: id, reason: why, cause }); }); toast("記録しました。審査で見直します"); return; }
+    // 法典
+    if ((b = q("[data-cview]"))) { state.cview = b.dataset.cview; renderCode(); return; }
+    if ((b = q("[data-open]"))) { state.open = b.dataset.open; renderDetail(); const box = document.getElementById("code-detail"); if (box.scrollIntoView) box.scrollIntoView({ block: "nearest" }); return; }
+    if ((b = q("[data-open-art]"))) { state.open = b.dataset.openArt; showView("code"); renderDetail(); return; }
+    if (q("[data-close]")) { state.open = null; renderDetail(); return; }
+    if (q("[data-import]")) { const parsed = parseConstitution(val("imp")); if (!parsed.length) { toast("本文を貼り付けてください"); return; }
+      if (live(state.data).length && !confirm("いまの草案の後ろに、" + parsed.length + "条を足しますか。")) return;
+      const items = parsed.map(p => Object.assign({ id: "a" + uid() + Math.random().toString(36).slice(2, 5), kind: "", root: false, basis: [] }, p));
+      await commit(d => { items.forEach(it => { if (!d.articles.some(x => x.id === it.id)) d.articles.push(clone(it)); }); });
+      toast(parsed.length + "条を取り込みました。条を押して、理念か制度かを決めてください"); return; }
+    if (q("[data-add-draft]")) { const id = "a" + uid(); await commit(d => { d.articles.push({ id, no: Math.max(0, ...live(d).map(x => x.no)) + 1, chapter: "", title: "", text: "", kind: "", root: false, basis: [] }); }); state.open = id; renderDetail(); return; }
+    if ((b = q("[data-dr-save]"))) { const id = b.dataset.drSave, kind = val("dr-kind"), v = { no: Math.max(0, Math.round(+val("dr-no")) || 0), chapter: val("dr-ch").trim(), title: val("dr-title").trim(), text: val("dr-text").trim(), kind,
+        root: kind === "理念" && document.getElementById("dr-root").checked, basis: kind === "制度" ? Array.from(document.querySelectorAll("[data-dr-basis]")).filter(x => x.checked).map(x => x.dataset.drBasis) : [], review: kind === "制度" ? val("dr-review") : "" };
+      await commit(d => { const a = byId(d, id); if (a) Object.assign(a, v); }); toast("保存しました"); return; }
+    if ((b = q("[data-dr-del]"))) { if (!confirm("この条を草案から消しますか。")) return; const id = b.dataset.drDel;
+      await commit(d => { d.articles = d.articles.filter(x => x.id !== id); d.articles.forEach(x => { if (x.basis) x.basis = x.basis.filter(y => y !== id); }); }); state.open = null; renderAll(); return; }
+    if (q("[data-enact]")) { const ls = live(state.data), nb = ls.filter(a => a.kind === "制度" && !(a.basis || []).length).length;
+      if (ls.some(a => !a.kind)) return;
+      if (!confirm("憲法を制定しますか。" + (nb ? "\n根拠の理念に結びついていない制度が " + nb + "条あります(あとで改正の「根拠を変える」で結びつけられます)。" : "") + "\n制定したあとは、本文は改正の手続きでしか変えられません。")) return;
+      await commit(d => { if (d.phase === "enacted") return; d.phase = "enacted"; d.enactedAt = today; d.ver = 1; d.history.push({ ver: 1, date: today, type: "enact", reason: "制定" }); });
+      se("fanfare"); toast("憲法を制定しました。第1版"); return; }
+    if ((b = q("[data-rv-save]"))) { const id = b.dataset.rvSave, v = val("rv-date"); await commit(d => { const a = byId(d, id); if (a) a.review = v; }); toast("見直しの日を保存しました"); return; }
+    if ((b = q("[data-suspend]"))) { const id = b.dataset.suspend, days = val("sp-days"), why = val("sp-why"); const err = suspend(clone(state.data), byId(clone(state.data), id), days, why, today);
+      if (err) { toast(err); return; } if (!confirm("この制度を一時停止しますか。過ぎたら自動で元に戻ります。")) return;
+      await commit(d => { suspend(d, byId(d, id), days, why, today); }); se("lock"); return; }
+    if ((b = q("[data-dp-save]"))) { const id = b.dataset.dpSave, v = { reason: val("dp-reason"), origin: val("dp-origin"), counter: val("dp-counter"), answer: val("dp-answer"), recite: document.getElementById("dp-recite").checked, natural: document.getElementById("dp-natural").checked };
+      await commit(d => { const a = byId(d, id); if (a) a.deep = Object.assign({}, a.deep || {}, v); }); se("save"); toast("ノートを保存しました"); return; }
+    if ((b = q("[data-ev-add]"))) { const id = b.dataset.evAdd, t = val("ev-in").trim(); if (!t) return;
+      await commit(d => { const a = byId(d, id); if (!a) return; a.deep = a.deep || {}; a.deep.evidence = (a.deep.evidence || []).concat([{ date: today, text: t }]); }); return; }
+    if ((b = q("[data-belief]"))) { const [id, n] = b.dataset.belief.split(":");
+      await commit(d => { const a = byId(d, id); if (!a) return; a.deep = a.deep || {}; a.deep.belief = (a.deep.belief || []).filter(x => x.date !== today).concat([{ date: today, v: +n }]); }); toast("記録しました"); return; }
+    // 改正
+    if ((b = q("[data-propose]"))) { state.amendOpen = true; state.amendDraft = { type: "edit", target: b.dataset.propose }; showView("amend"); renderAmend(); return; }
+    if (q("[data-amend-open]")) { state.amendOpen = true; renderAmend(); return; }
+    if (q("[data-amend-x]")) { state.amendOpen = false; state.amendDraft = null; renderAmend(); return; }
+    if (q("[data-amend-submit]")) {
+      const x = readAmend(), a = x.target && byId(state.data, x.target);
+      if (!String(x.reason || "").trim()) { toast("理由を書いてください"); return; }
+      if (x.type === "edit" && (!String(x.newText || "").trim() || (a && x.newText.trim() === a.text && (x.newTitle || "") === (a.title || "")))) { toast("新しい本文を書いてください(今と同じです)"); return; }
+      if (x.type === "add" && !String(x.newText || "").trim()) { toast("足す条の本文を書いてください"); return; }
+      if (x.type === "kind" && a && x.newKind === a.kind) { toast("今と同じ種類です"); return; }
+      const block = proposeBlock(state.data, x, today); if (block) { toast(block); return; }
+      if (x.newText) x.newText = x.newText.trim();
+      const prop = newProposal(state.data, x, today);
+      await commit(d => { if (!d.proposals.some(y => y.id === prop.id)) d.proposals.push(clone(prop)); });
+      state.amendOpen = false; state.amendDraft = null; renderAmend(); se("send");
+      toast("発議しました。" + md(prop.coolUntil) + " まで冷却します"); return; }
+    if ((b = q("[data-ans-save]"))) { const id = b.dataset.ansSave, ans = {}; document.querySelectorAll('[data-ans-q^="' + id + ':"]').forEach(t => { ans[t.dataset.ansQ.split(":")[1]] = t.value; });
+      await commit(d => { const p = d.proposals.find(y => y.id === id); if (p) p.answers = Object.assign({}, p.answers || {}, ans); }); toast("答えを保存しました"); return; }
+    if ((b = q("[data-vote]"))) { const [id, yn] = b.dataset.vote.split(":"), yes = yn === "yes";
+      if (!yes && !confirm("この改正案を否決しますか。")) return;
+      if (yes && !confirm("可決しますか。")) return;
+      let res = ""; await commit(d => { const p = d.proposals.find(y => y.id === id); if (p) res = vote(d, p, yes, today); });
+      if (res && res !== "first") { toast(res); return; }
+      if (!yes) { se("down"); toast("否決しました"); } else if (res === "first") { se("save"); toast("1回目の議決を終えました。2回目は別の日に"); } else { se("fanfare"); toast("可決し、公布しました。明日から施行します(第" + state.data.ver + "版)"); }
+      return; }
+    if ((b = q("[data-withdraw]"))) { if (!confirm("この改正案を取り下げますか。")) return; const id = b.dataset.withdraw; await commit(d => { const p = d.proposals.find(y => y.id === id); if (p) { p.status = "withdrawn"; p.decided = today; } }); return; }
+    if ((b = q("[data-pe]"))) { state.propEdit = b.dataset.pe; renderAmend(); return; }
+    if (q("[data-pe-x]")) { state.propEdit = null; renderAmend(); return; }
+    if ((b = q("[data-pe-save]"))) { const id = b.dataset.peSave, v = { newText: val("pe-text").trim(), reason: val("pe-reason").trim() };
+      await commit(d => { const p = d.proposals.find(y => y.id === id); if (p) editProposal(d, p, v, today); }); state.propEdit = null; renderAmend(); toast("案を直しました。冷却はやり直しです"); return; }
+    // 判例
+    if (q("[data-case-add]")) { const v = { situation: val("cs-sit").trim(), decision: val("cs-dec").trim(), reason: val("cs-why").trim(), articles: Array.from(document.querySelectorAll("[data-cs-art]")).filter(x => x.checked).map(x => x.dataset.csArt) };
+      if (!v.situation || !v.decision) { toast("場面と、どう決めたかを書いてください"); return; }
+      const rid = "c" + uid(); await commit(d => { d.cases.push(Object.assign({ id: rid, date: today }, v)); }); se("save"); toast("判例として残しました"); return; }
+    if ((b = q("[data-case-eval]"))) { const [id, ev] = b.dataset.caseEval.split(":"), note = (window.prompt("振り返りの一言(なくてもいい)", "") || "").trim();
+      await commit(d => { const c = d.cases.find(y => y.id === id); if (c) { c.eval = ev; c.evalNote = note; c.evalDate = today; } }); return; }
+    // 審査
+    if ((b = q("[data-trial]"))) { const [id, k] = b.dataset.trial.split(":"); await commit(d => endTrial(d, byId(d, id), k === "keep", today)); toast(k === "keep" ? "本採用にしました" : "元に戻しました"); return; }
+    if ((b = q("[data-rv-ok]"))) { const id = b.dataset.rvOk; await commit(d => { const a = byId(d, id); if (a) a.review = addDays(today, 90); }); return; }
+    if ((b = q("[data-susp-ok]"))) { const id = b.dataset.suspOk; await commit(d => { const a = byId(d, id); if (a && a.suspended) a.suspended.done = true; }); return; }
+    if (q("[data-review-done]")) { const memo = val("rv-memo").trim(); await commit(d => { if (!d.reviews.some(r => r.date === today)) d.reviews.push({ date: today, memo }); else d.reviews.find(r => r.date === today).memo = memo; }); se("levelup"); toast("審査を終えました"); return; }
+  });
+  document.getElementById("save-set").addEventListener("click", async () => {
+    const n = (id, lo, hi) => { const v = Math.round(+val(id)); return isFinite(v) && v >= lo && v <= hi ? v : null; };
+    const v = { coolSeido: n("s-cs", 0, 90), coolRinen: n("s-cr", 0, 180), trial: n("s-trial", 1, 180), susp: n("s-susp", 1, 60), lock: n("s-lock", 0, 365), review: n("s-rev", 1, 60) };
+    await commit(d => { Object.keys(v).forEach(k => { if (v[k] != null) d.settings[k] = v[k]; }); });
+    const st = document.getElementById("set-status"); st.textContent = "保存しました";
+  });
+  document.getElementById("connect").addEventListener("click", async () => {
+    const c = { owner: val("c-owner").trim(), repo: val("c-repo").trim() || "notion-daily", branch: val("c-branch").trim() || "main", token: val("c-token").trim() };
+    if (!c.owner || !c.token) { const st = document.getElementById("conn-status"); st.classList.add("err"); st.textContent = "ユーザー名とトークンを入れてください。"; return; }
+    state.conn = c; lsSet(KEY_CONN, c); await loadAll();
+  });
+}
+function boot(){
+  if ("serviceWorker" in navigator && !window.__ksTest) navigator.serviceWorker.register("./sw.js").catch(() => {});
+  const local = lsGet(KEY_LOCAL, null); if (local && local.data) state.data = norm(local.data);
+  const c = lsGet(KEY_CONN, null);
+  document.getElementById("c-owner").value = c ? c.owner : ""; document.getElementById("c-repo").value = c ? c.repo : "notion-daily";
+  document.getElementById("c-branch").value = c ? c.branch : "main"; document.getElementById("c-token").value = c ? c.token : "";
+  document.getElementById("app-version").textContent = APP_VERSION; document.getElementById("ver").textContent = APP_VERSION;
+  bind(); renderAll();
+  try { SE.init([["[data-vote], [data-enact], [data-plan-save], [data-day-ans], [data-review-done], [data-amend-submit], [data-suspend]", null], ["[data-open], [data-cview]", "pluck"], ["[data-dr-del], [data-withdraw]", "remove"], ["nav.tabs button", "tab"]]); SE.mount(document.getElementById("se-anchor")); } catch (e) {}
+  if (c && c.token) { state.conn = c; loadAll(); }
+}
+window.__ks = { state, parseConstitution, kanjiNum, ruleOf, proposeBlock, newProposal, editProposal, stageOf, vote, promulgate, endTrial, suspend, deepLevel, triggers, isSuspended, todayPick, live, byId, QUESTIONS, addDays };
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+})();
+</script>
+</body>
+</html>
